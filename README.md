@@ -1,137 +1,125 @@
-<div align="center">
-  <img src="docs/assets/skillpath-banner.svg" alt="SkillPath AI, a personalized career learning platform" width="100%" />
+# AI-Powered Personalized Learning Platform
 
-  <p><strong>Turn a career goal into a practical, adaptive learning path.</strong></p>
+An adaptive learning dashboard that analyzes a learner's skills against a career goal, prioritizes learning resources, and updates mastery estimates as they progress.
 
-  <p>
-    <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" />
-    <img alt="FastAPI" src="https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white" />
-    <img alt="React" src="https://img.shields.io/badge/UI-React-149ECA?logo=react&logoColor=white" />
-  </p>
-</div>
+![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/UI-React-149ECA?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Frontend-Vite-646CFF?logo=vite&logoColor=white)
 
-SkillPath AI is a career-readiness dashboard that connects a learner's current skills to a target role. It analyzes skill gaps, compares career paths, and builds an ordered roadmap that adapts as the learner completes resources, takes assessments, or changes goals.
+## Screenshots
 
-## Product Overview
+<p align="center">
+  <img src="frontend-verification.png" alt="Learning platform dashboard in dark mode" width="49%" />
+  <img src="frontend-verification-light.png" alt="Learning platform dashboard in light mode" width="49%" />
+</p>
 
-![SkillPath AI architecture: React dashboard, FastAPI services and agents, and SQLite persistence](docs/assets/architecture.svg)
+## What it does
 
-The dashboard brings together readiness metrics, skill analysis, career matching, roadmap progress, assessments, and a learning mentor. The backend keeps scoring and matching deterministic; Gemini is optional and is used for generated explanations, mentor responses, and quiz content.
+- Builds a skill profile from self-assessments, quiz results, and project evidence.
+- Compares a learner's profile with a target career and reports skill gaps and readiness.
+- Ranks learning resources by skill gap, role importance, and estimated study time.
+- Tracks mastery using Bayesian Knowledge Tracing and adjusts recommendations after assessments.
+- Coordinates skill analysis, career matching, recommendations, progress tracking, and mentoring through five agents.
+- Provides a React dashboard, authenticated FastAPI endpoints, and downloadable completion certificates.
+- Supports optional AI mentoring through providers including Groq, NVIDIA NIM, OpenRouter, OpenAI, Gemini, and Claude.
 
-### Learning loop
+## How the learning flow works
 
-1. Create a learner profile and choose a target career.
-2. Compare existing skills with the role's weighted requirements.
-3. Generate a prerequisite-aware learning roadmap.
-4. Complete resources and submit skill assessments.
-5. Recalculate readiness and adapt the next learning steps.
+```mermaid
+flowchart LR
+    A[Learner profile and assessments] --> B[Skill analysis]
+    B --> C[Career matching and gap report]
+    C --> D[Prioritized learning recommendations]
+    D --> E[Learning and progress tracking]
+    E --> F[Mastery update and mentor guidance]
+    F --> C
+```
 
-## Features
+## Tech stack
 
-- Weighted role matching with clear missing, weak, and satisfied skill gaps.
-- Skill analysis, readiness scoring, and a progress dashboard.
-- Agent-coordinated roadmap generation with prerequisite-aware resources.
-- Assessment-driven interventions that add remedial or advanced practice.
-- Goal changes that rebuild the roadmap while retaining mastered skills.
-- Learning mentor and quiz generation powered optionally by Gemini.
-- Demo learner data and a deterministic offline mode for local development.
-- FastAPI interactive documentation at `/docs`.
-
-## Technology
-
-| Area | Stack |
+| Area | Technologies |
 | --- | --- |
-| Frontend | React, Vite, Tailwind CSS, Recharts, Lucide |
+| Frontend | React, Vite, JavaScript |
 | API | FastAPI, Pydantic |
-| Persistence | SQLAlchemy 2, SQLite |
-| Agent workflows | Python services and coordinated learning agents |
-| Optional language model | Google Gemini API |
-| Tests | pytest, HTTPX |
+| Agents and learning logic | LangGraph, deterministic skill and recommendation formulas |
+| Persistence | SQLAlchemy, SQLite |
+| Authentication and certificates | JWT, password hashing, ReportLab |
 
-## Run Locally
+## Run locally
 
-Prerequisites: Python 3.10 or later and Node.js 18 or later.
+### Requirements
 
-### 1. Start the API
+- Python 3.12 or newer
+- Node.js 18 or newer and npm
 
-From the repository root, create and activate a virtual environment, then install the backend dependencies:
+### 1. Start the backend
 
-```powershell
-py -m venv .venv
-.venv\Scripts\Activate.ps1
-py -m pip install -r requirements.txt
-```
-
-Seed the demo learner and learning catalog, then start the API:
+From the project root, create a virtual environment and install the backend packages:
 
 ```powershell
-py seed.py
-py -m uvicorn main:app --reload
+py -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install fastapi "uvicorn[standard]" sqlalchemy "pydantic[email]" pyjwt slowapi cryptography reportlab langgraph httpx
+$env:PYTHONPATH = "backend"
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-The API is available at `http://127.0.0.1:8000`; interactive API docs are at `http://127.0.0.1:8000/docs`.
+The API initializes its SQLite database and demo data at startup. API documentation is available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-### 2. Start the dashboard
+### 2. Start the frontend
 
-In a second terminal:
+In a second terminal, from the project root:
 
 ```powershell
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-Open the Vite URL shown in the terminal, usually `http://localhost:5173`.
+Open the Vite URL shown in the terminal (usually [http://localhost:5173](http://localhost:5173)). The development server proxies API requests to the backend on port 8000.
 
-### Optional Gemini setup
+The demo account used by the app is:
 
-The application works without an API key. It uses deterministic offline responses when no key is configured. To enable Gemini-backed responses and quiz generation, copy `.env.example` to `.env`, add your key, and set `LLM_MODE` to a non-mock value:
-
-```dotenv
-GEMINI_API_KEY=your-key
-GEMINI_MODEL=gemini-2.0-flash
-LLM_MODE=gemini
+```text
+Email:    demo@example.com
+Password: DemoPass123!
 ```
 
-Never commit `.env` or other secrets.
+### Optional AI mentor
 
-## Configuration
+The platform can run without an external AI provider. To enable one, configure a provider and API key in the app's Settings, or set `MENTOR_LLM_PROVIDER` and `MENTOR_LLM_API_KEY` in the backend environment. Keep real API keys out of source control.
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `DATABASE_URL` | `sqlite:///./backend/data/skillpath.db` | SQLAlchemy database URL |
-| `ALLOWED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated browser origins allowed by the API |
-| `GEMINI_API_KEY` | unset | Optional Gemini API key |
-| `GEMINI_MODEL` | `gemini-2.0-flash` | Gemini model used for generated content |
-| `LLM_MODE` | unset | Set to `mock` to force deterministic offline responses |
-| `VITE_API_BASE_URL` | `http://127.0.0.1:8000` | API URL used by the Vite frontend |
-
-## Tests and Build
-
-Run the backend tests from the repository root:
+For local development, set a private JWT signing key before starting the backend:
 
 ```powershell
-py -m pytest
+$env:JWT_SECRET = "<generate-a-long-random-secret>"
 ```
 
-Build the frontend:
+Do not use the development default for a public deployment.
+
+## Tests
+
+Install the test runner if needed, then run the backend tests from the project root:
 
 ```powershell
-cd frontend
-npm run build
+python -m pip install pytest
+$env:PYTHONPATH = "backend"
+python -m pytest backend/tests
 ```
 
-## Project Layout
+The repository also includes focused QA scripts under `backend/qa`.
+
+## Repository layout
 
 ```text
 backend/
-  agents/       Learner analysis, planning, assessment, mentor, and orchestration
-  models/       SQLAlchemy entities
-  routers/      REST API endpoints
-  services/     Matching, scoring, dashboard, and skill analysis
-frontend/       React and Vite dashboard
-tests/          Backend workflow and service tests
-docs/assets/    README illustrations
-main.py         FastAPI application entry point
-seed.py         Demo catalog and learner initialization
+  app/                 FastAPI routes, agents, models, formulas, and services
+  tests/               Backend tests
+  qa/                  QA and end-to-end verification scripts
+frontend/
+  src/                 React application and components
+frontend-verification*.png
+                       Dark- and light-mode screenshots
+run.ps1                Windows backend launch helper
 ```

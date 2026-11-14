@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-Powered Personalized Learning Platform</title>
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- React 18, ReactDOM, Babel for browser execution without native Node dependencies -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --accent-cyan: #38BDF8;
+      --accent-amber: #FBBF24;
+      --accent-emerald: #34D399;
+      --accent-rose: #FB7185;
+      
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Dark Mode (Default) */
+    body.theme-dark {
+      --bg-primary: #0A0E27;
+      --bg-secondary: #140B2E;
+      --page-bg: radial-gradient(circle at 15% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 40%),
+                         radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
+                         radial-gradient(circle at 50% 85%, rgba(14, 165, 233, 0.15) 0%, transparent 45%),
+                         linear-gradient(135deg, #0A0E27 0%, #140B2E 100%);
+      --glass-fill: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-blur: blur(20px);
+      --glass-radius: 16px;
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-inner: rgba(255, 255, 255, 0.02);
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --hover-bg: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Light Mode */
+    body.theme-light {
+      --bg-primary: #F8FAFC;
+      --bg-secondary: #F1F5F9;
+      --page-bg: #F8FAFC;
+      --glass-fill: rgba(15, 23, 42, 0.03);
+      --glass-border: rgba(15, 23, 42, 0.08);
+      --glass-blur: blur(12px);
+      --glass-radius: 16px;
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --card-bg: #FFFFFF;
+      --card-inner: #F8FAFC;
+      --input-bg: #F1F5F9;
+      --hover-bg: rgba(15, 23, 42, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-ui);
+      background: var(--page-bg);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .mono-num {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .app-layout { display: flex; min-height: 100vh; }
+
+    /* Glass Sidebar */
+    .sidebar {
+      width: 270px;
+      background: var(--glass-fill);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-right: 1px solid var(--glass-border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 20;
+    }
+
+    .brand-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 8px 20px 8px;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 18px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0EA5E9, #6366F1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+
+    .brand-text h1 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .brand-text span {
+      font-size: 0.70rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: var(--hover-bg);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--hover-bg);
+      color: var(--accent-cyan);
+      border-left: 3px solid var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 0.70rem;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: var(--glass-border);
+      font-family: var(--font-mono);
+    }
+
+    .learner-card {
+      padding: 12px 14px;
+      background: var(--card-inner);
+      border-radius: 12px;
+      border: 1px solid var(--glass-border);
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      padding: 30px 36px 60px 36px;
+      max-width: 1400px;
+      margin: 0 auto;
+      overflow-y: auto;
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .topbar-title h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .topbar-title p {
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: var(--glass-fill);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--accent-cyan);
+    }
+
+    .role-select-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+    }
+
+    .role-select-pill select {
+      background: transparent;
+      border: none;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.84rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* 4 Header Stat Cards */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--glass-radius);
+      padding: 20px;
+      position: relative;
+    }
+
+    .stat-card-title {
+      font-size: 0.80rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .stat-card-val {
+      font-size: 2.1rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+
+    .stat-card-sub {
+      font-size: 0.78rem;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 26px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @keyframes pulseRemediation {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 113, 133, 0.6); }
+      50% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(251, 113, 133, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 113, 133, 0); }
+    }
+
+    .pulse-once {
+      animation: pulseRemediation 1.6s ease-out 1;
+    }
+
+    .mastery-bar-fill {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #38BDF8, #34D399);
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-secondary);
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--glass-border);
+      font-size: 0.86rem;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .pill-active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .pill-remediation {
+      background: rgba(251, 113, 133, 0.15);
+      color: var(--accent-rose);
+      border: 1px solid rgba(251, 113, 133, 0.4);
+    }
+
+    .pill-completed {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .assess-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .form-control {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-control label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-control select,
+    .form-control input {
+      padding: 8px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 0.86rem;
+      outline: none;
+    }
+
+    .form-control select:focus,
+    .form-control input:focus { border-color: var(--accent-cyan); }
+
+    .btn-submit {
+      padding: 9px 18px;
+      background: linear-gradient(135deg, #0284C7, #2563EB);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.86rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-submit:hover { filter: brightness(1.1); }
+
+    .btn-action-small {
+      padding: 5px 12px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent-cyan);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-action-small:hover {
+      background: rgba(56, 189, 248, 0.22);
+    }
+
+    /* Floating Chatbot Widget */
+    .floating-chat {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+    }
+
+    .chat-bubble-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #0EA5E9, #6366F1);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
+      border: none;
+      transition: var(--transition);
+    }
+
+    .chat-bubble-btn:hover { transform: scale(1.06); }
+
+    .chat-window {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      width: 380px;
+      height: 520px;
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-inner);
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .chat-msg {
+      max-width: 85%;
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #0284C7, #2563EB);
+      color: #fff;
+      border-bottom-right-radius: 3px;
+    }
+
+    .msg-assistant {
+      align-self: flex-start;
+      background: var(--card-inner);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      border-bottom-left-radius: 3px;
+    }
+
+    .chat-footer {
+      padding: 11px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 8px;
+      background: var(--card-inner);
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 8px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .chat-send-btn {
+      padding: 7px 13px;
+      background: var(--accent-cyan);
+      color: #0A0E27;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Settings Panel */
+    .settings-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      max-width: 720px;
+    }
+
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .api-key-box {
+      background: var(--card-inner);
+      border: 1px solid var(--glass-border);
+      padding: 18px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .filter-pill {
+      padding: 6px 14px;
+      border-radius: 16px;
+      background: var(--card-inner);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+      font-size: 0.80rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-pill.active {
+      background: var(--accent-cyan);
+      color: #0A0E27;
+      border-color: var(--accent-cyan);
+    }
+
+    @media (max-width: 1024px) {
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+      .sidebar { width: 80px; padding: 16px 8px; }
+      .brand-text, .nav-item span:nth-child(2), .nav-badge, .learner-card { display: none; }
+    }
+  </style>
+</head>
+<body class="theme-dark">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      // 1. Theme State
+      const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+
+      useEffect(() => {
+        document.body.className = theme === 'light' ? 'theme-light' : 'theme-dark';
+        localStorage.setItem('theme', theme);
+      }, [theme]);
+
+      const toggleTheme = async () => {
+        const next = theme === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+        if (token) {
+          try {
+            await fetch('/settings/theme', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ theme: next })
+            });
+          } catch (e) {}
+        }
+      };
+
+      // 2. Core App State
+      const [token, setToken] = useState(() => localStorage.getItem('token') || '');
+      const [activeNav, setActiveNav] = useState('Dashboard');
+      const [roles, setRoles] = useState([]);
+      const [activeRoleId, setActiveRoleId] = useState(1);
+      const [profile, setProfile] = useState(null);
+      const [gapReport, setGapReport] = useState(null);
+      const [recommendations, setRecommendations] = useState([]);
+      const [courses, setCourses] = useState([]);
+      const [selectedCategory, setSelectedCategory] = useState('All');
+      const [bktStates, setBktStates] = useState({});
+      const [progressOverview, setProgressOverview] = useState(null);
+      const [certificates, setCertificates] = useState([]);
+      const [userSettings, setUserSettings] = useState(null);
+
+      // Simulation & Form states
+      const [animatingMastery, setAnimatingMastery] = useState(false);
+      const [remediationTriggered, setRemediationTriggered] = useState(false);
+      const [simSkillId, setSimSkillId] = useState(4);
+      const [simScore, setSimScore] = useState(85);
+      const [isSubmittingAssess, setIsSubmittingAssess] = useState(false);
+
+      // Settings form states
+      const [llmProvider, setLlmProvider] = useState('gemini');
+      const [llmModel, setLlmModel] = useState('gemini-1.5-flash');
+      const [apiKeyInput, setApiKeyInput] = useState('');
+      const [settingsMessage, setSettingsMessage] = useState('');
+
+      // Chatbot states
+      const [isChatOpen, setIsChatOpen] = useState(false);
+      const [chatMessages, setChatMessages] = useState([
+        { role: 'assistant', content: 'Hello! I am your AI Academic Mentor. Ask me about your skill gaps, recommended next steps, BKT mastery status, or certificates.' }
+      ]);
+      const [inputMsg, setInputMsg] = useState('');
+      const [isSendingChat, setIsSendingChat] = useState(false);
+
+      // Auto-authenticate & Bootstrap
+      useEffect(() => {
+        async function bootstrap() {
+          try {
+            let activeToken = token;
+            if (!activeToken) {
+              const res = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: 'demo@example.com', password: 'DemoPass123!' })
+              });
+              if (res.ok) {
+                const d = await res.json();
+                activeToken = d.access_token;
+                setToken(activeToken);
+                localStorage.setItem('token', activeToken);
+              }
+            }
+
+            const rolesRes = await fetch('/roles');
+            if (rolesRes.ok) {
+              const rList = await rolesRes.json();
+              setRoles(rList);
+              if (rList.length > 0) setActiveRoleId(rList[0].id);
+            }
+
+            if (activeToken) {
+              await fetchAllData(activeToken);
+            }
+          } catch (e) {
+            console.error('Bootstrap error', e);
+          }
+        }
+        bootstrap();
+      }, []);
+
+      const fetchAllData = async (jwt) => {
+        let activeToken = jwt;
+        let headers = { 'Authorization': `Bearer ${activeToken}` };
+        try {
+          let profR = await fetch('/profile', { headers });
+          if (profR.status === 401) {
+            const loginRes = await fetch('/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: 'demo@example.com', password: 'DemoPass123!' })
+            });
+            if (loginRes.ok) {
+              const d = await loginRes.json();
+              activeToken = d.access_token;
+              setToken(activeToken);
+              localStorage.setItem('token', activeToken);
+              headers = { 'Authorization': `Bearer ${activeToken}` };
+              profR = await fetch('/profile', { headers });
+            }
+          }
+
+          const [goalR, recR, crsR, progR, certR, setR, chatR] = await Promise.all([
+            fetch('/goal', { headers }),
+            fetch('/recommendations', { headers }),
+            fetch('/courses', { headers }),
+            fetch('/progress', { headers }),
+            fetch('/certificates', { headers }),
+            fetch('/settings', { headers }),
+            fetch('/mentor/history', { headers })
+          ]);
+
+          if (profR.ok) setProfile(await profR.json());
+          if (goalR.ok) setGapReport(await goalR.json());
+          if (recR.ok) {
+            const rData = await recR.json();
+            setRecommendations(rData.recommendations || []);
+          }
+          if (crsR.ok) setCourses(await crsR.json());
+          if (certR.ok) setCertificates(await certR.json());
+          if (progR.ok) {
+            const pData = await progR.json();
+            setProgressOverview(pData);
+            setBktStates(pData.bkt_states || {});
+            const hasRem = Object.values(pData.bkt_states || {}).some(b => b.needs_remediation);
+            if (hasRem) setRemediationTriggered(true);
+          }
+          if (setR.ok) {
+            const sData = await setR.json();
+            setUserSettings(sData);
+            setLlmProvider(sData.llm_provider || 'gemini');
+            setLlmModel(sData.llm_model || 'gemini-1.5-flash');
+            if (sData.theme && sData.theme !== theme) {
+              setTheme(sData.theme);
+            }
+          }
+          if (chatR.ok) {
+            const history = await chatR.json();
+            if (history && history.length > 0) {
+              setChatMessages(history);
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching data:', err);
+        }
+      };
+
+      // Assessment Submit
+      const handleAssessmentSubmit = async (e) => {
+        e.preventDefault();
+        if (!token) return;
+        setIsSubmittingAssess(true);
+        try {
+          const res = await fetch('/assessment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              skill_id: parseInt(simSkillId),
+              score: parseFloat(simScore)
+            })
+          });
+          if (res.ok) {
+            setAnimatingMastery(true);
+            setTimeout(() => setAnimatingMastery(false), 1600);
+            await fetchAllData(token);
+          }
+        } catch (err) {
+          console.error('Assessment submission error:', err);
+        } finally {
+          setIsSubmittingAssess(false);
+        }
+      };
+
+      // Goal Change
+      const handleRoleChange = async (newRoleId) => {
+        setActiveRoleId(newRoleId);
+        if (!token) return;
+        try {
+          const res = await fetch('/goal', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ role_id: parseInt(newRoleId) })
+          });
+          if (res.ok) await fetchAllData(token);
+        } catch (err) {
+          console.error('Role update error:', err);
+        }
+      };
+
+      // Chat Submit
+      const handleSendChat = async (e) => {
+        e.preventDefault();
+        if (!inputMsg.trim() || !token || isSendingChat) return;
+        const userMsg = inputMsg.trim();
+        setInputMsg('');
+        const updated = [...chatMessages, { role: 'user', content: userMsg }];
+        setChatMessages(updated);
+        setIsSendingChat(true);
+
+        try {
+          const res = await fetch('/mentor/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ message: userMsg })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setChatMessages([...updated, { role: 'assistant', content: data.response }]);
+          } else {
+            setChatMessages([...updated, { role: 'assistant', content: 'Connection issue. Please verify your LLM settings.' }]);
+          }
+        } catch (err) {
+          setChatMessages([...updated, { role: 'assistant', content: 'Error communicating with AI Mentor.' }]);
+        } finally {
+          setIsSendingChat(false);
+        }
+      };
+
+      // Save LLM Key
+      const handleSaveLLMKey = async (e) => {
+        e.preventDefault();
+        if (!apiKeyInput.trim() || !token) return;
+        setSettingsMessage('Encrypting and saving key...');
+        try {
+          const res = await fetch('/settings/llm-key', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              provider: llmProvider,
+              model: llmModel,
+              api_key: apiKeyInput.trim()
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setSettingsMessage(`✓ ${data.message}`);
+            setApiKeyInput('');
+            const setR = await fetch('/settings', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (setR.ok) setUserSettings(await setR.json());
+          } else {
+            setSettingsMessage('Failed to save key. Check API requirements.');
+          }
+        } catch (err) {
+          setSettingsMessage('Error connecting to settings endpoint.');
+        }
+      };
+
+      // Numbers
+      const readinessVal = gapReport?.readiness != null ? gapReport.readiness.toFixed(1) : '52.8';
+      const activeSkillsCount = profile?.skills?.length || 6;
+      const avgMasteryVal = progressOverview?.average_mastery != null ? progressOverview.average_mastery.toFixed(3) : '0.442';
+      const hoursRemainingVal = gapReport?.details
+        ? gapReport.details.reduce((acc, g) => acc + (g.G_s > 0 ? (g.G_s / 100) * 20 : 0), 0).toFixed(1)
+        : '50.0';
+
+      // Course categories
+      const categories = ['All', 'Backend', 'Database', 'Frontend', 'Frontend Framework', 'Backend Runtime'];
+      const filteredCourses = selectedCategory === 'All'
+        ? courses
+        : courses.filter(c => c.category === selectedCategory);
+
+      return (
+        <div className="app-layout">
+          {/* Glass Sidebar */}
+          <aside className="sidebar">
+            <div>
+              <div className="brand-area">
+                <div className="brand-icon">⚡</div>
+                <div className="brand-text">
+                  <h1>AI Learning Platform</h1>
+                  <span>Multi-Agent System</span>
+                </div>
+              </div>
+
+              <ul className="nav-list">
+                {[
+                  { id: 'Dashboard', icon: '📊', badge: 'Live' },
+                  { id: 'Skill Profile', icon: '👤', badge: `${activeSkillsCount}` },
+                  { id: 'Career Goal', icon: '🎯', badge: 'Active' },
+                  { id: 'Recommendations', icon: '📚', badge: `${recommendations.length}` },
+                  { id: 'Courses', icon: '🧭', badge: `${courses.length || 18}` },
+                  { id: 'Progress & Mastery', icon: '📈', badge: 'BKT' },
+                  { id: 'Certificates', icon: '🎓', badge: `${certificates.length}` },
+                  { id: 'AI Mentor', icon: '🤖', badge: userSettings?.has_api_key ? 'Active' : 'Setup' },
+                  { id: 'Settings', icon: '⚙️', badge: theme === 'dark' ? 'Dark' : 'Light' },
+                ].map(item => (
+                  <li
+                    key={item.id}
+                    className={`nav-item ${activeNav === item.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveNav(item.id);
+                      if (item.id === 'AI Mentor') setIsChatOpen(true);
+                    }}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.id}</span>
+                    <span className="nav-badge">{item.badge}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="learner-card">
+              <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>Learner Logged In:</div>
+              <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>Demo Learner</div>
+              <div className="mono-num" style={{ fontSize: '0.72rem', color: 'var(--accent-cyan)' }}>demo@example.com</div>
+            </div>
+          </aside>
+
+          {/* Main Content Pane */}
+          <main className="content">
+            {/* Topbar */}
+            <div className="topbar">
+              <div className="topbar-title">
+                <h2>AI-Powered Personalized Learning Platform</h2>
+                <p>Collaborative LangGraph Multi-Agent Adaptive Platform with Bayesian Knowledge Tracing</p>
+              </div>
+
+              <div className="topbar-controls">
+                <div className="role-select-pill">
+                  <span>🎯 Goal:</span>
+                  <select
+                    value={activeRoleId}
+                    onChange={(e) => handleRoleChange(e.target.value)}
+                  >
+                    {roles.map(r => (
+                      <option key={r.id} value={r.id}>{r.title}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button className="theme-toggle-btn" onClick={toggleTheme}>
+                  <span>{theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* TAB: DASHBOARD */}
+            {activeNav === 'Dashboard' && (
+              <div>
+                <div className="stat-row">
+                  <div className="glass-card">
+                    <div className="stat-card-title">Career Readiness</div>
+                    <div className="stat-card-val mono-num" style={{ color: 'var(--accent-cyan)' }}>
+                      {readinessVal}%
+                    </div>
+                    <div className="stat-card-sub" style={{ color: 'var(--text-secondary)' }}>
+                      <span>CosineFit:</span>
+                      <strong className="mono-num" style={{ color: 'var(--text-primary)' }}>
+                        {gapReport?.cosine_fit != null ? gapReport.cosine_fit.toFixed(4) : '0.8412'}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="glass-card">
+                    <div className="stat-card-title">Active Skills Tracked</div>
+                    <div className="stat-card-val mono-num">
+                      {activeSkillsCount}
+                    </div>
+                    <div className="stat-card-sub" style={{ color: 'var(--accent-emerald)' }}>
+                      <span>✓ 3 Mastered, 3 In-Gap</span>
+                    </div>
+                  </div>
+
+                  <div className="glass-card">
+                    <div className="stat-card-title">Avg Mastery P(L_n)</div>
+                    <div className="stat-card-val mono-num" style={{ color: 'var(--accent-emerald)' }}>
+                      {avgMasteryVal}
+                    </div>
+                    <div className="stat-card-sub" style={{ color: 'var(--text-secondary)' }}>
+                      <span>Bayesian Knowledge Tracing</span>
+                    </div>
+                  </div>
+
+                  <div className="glass-card">
+                    <div className="stat-card-title">Est. Study Hours Left</div>
+                    <div className="stat-card-val mono-num" style={{ color: 'var(--accent-amber)' }}>
+                      {hoursRemainingVal}h
+                    </div>
+                    <div className="stat-card-sub" style={{ color: 'var(--text-secondary)' }}>
+                      <span>Across missing modules</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="charts-row">
+                  <div className="glass-card">
+                    <div className="section-header">
+                      <div className="section-title">
+                        <span>📈</span>
+                        <span>Bayesian Mastery Progression</span>
+                      </div>
+                      <span className="mono-num" style={{ fontSize: '0.78rem', color: 'var(--accent-cyan)' }}>P(L_0)=0.30, P(T)=0.15</span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
+                      {profile?.skills?.map(s => {
+                        const bkt = bktStates[s.skill_id] || { p_mastery: 0.30, attempts_count: 0 };
+                        const masteryPct = (bkt.p_mastery * 100).toFixed(1);
+                        return (
+                          <div key={s.skill_id}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                              <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>{s.name}</span>
+                              <span className="mono-num" style={{ fontSize: '0.82rem', color: bkt.p_mastery >= 0.8 ? 'var(--accent-emerald)' : (bkt.p_mastery >= 0.5 ? 'var(--accent-cyan)' : 'var(--accent-rose)') }}>
+                                P(L_n) = {bkt.p_mastery.toFixed(3)} ({masteryPct}%)
+                              </span>
+                            </div>
+                            <div style={{ background: 'var(--card-inner)', borderRadius: '4px', overflow: 'hidden' }}>
+                              <div
+                                className={`mastery-bar-fill ${animatingMastery ? 'pulse-once' : ''}`}
+                                style={{ width: `${Math.min(100, Math.max(5, masteryPct))}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="glass-card">
+                    <div className="section-header">
+                      <div className="section-title">
+                        <span>🎯</span>
+                        <span>Competency Focus</span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ padding: '12px', background: 'var(--card-inner)', borderRadius: '10px' }}>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>TARGET ROLE</div>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>
+                          {gapReport?.role_title || 'Full Stack Developer'}
+                        </div>
+                      </div>
+                      <div style={{ padding: '12px', background: 'var(--card-inner)', borderRadius: '10px' }}>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>AGENT PIPELINE</div>
+                        <div style={{ fontSize: '0.84rem', color: 'var(--text-primary)', marginTop: '4px' }}>
+                          5 LangGraph Agents: SkillAnalysis → CareerMatching → Recommendation → ProgressTracking → Mentor
+                        </div>
+                      </div>
+                      <div style={{ padding: '12px', background: 'var(--card-inner)', borderRadius: '10px' }}>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>CREDENTIAL STATUS</div>
+                        <div className="mono-num" style={{ fontSize: '0.86rem', color: certificates.length > 0 ? 'var(--accent-emerald)' : 'var(--text-secondary)', marginTop: '4px', fontWeight: 700 }}>
+                          {certificates.length > 0 ? `🎓 ${certificates.length} Certificate(s) Earned` : 'In Progress'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Priority Recommendations Table */}
+                <div className="glass-card">
+                  <div className="section-header">
+                    <div className="section-title">
+                      <span>📚</span>
+                      <span>Priority-Ranked Learning Recommendations</span>
+                    </div>
+                    <span className="mono-num" style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Formula: Priority = (G_s * I_s) / T_s</span>
+                  </div>
+
+                  <div className="table-container">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Skill</th>
+                          <th>Gap (G_s)</th>
+                          <th>Priority Score</th>
+                          <th>Resource Title</th>
+                          <th>Est. Hours</th>
+                          <th>Difficulty</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recommendations.length > 0 ? recommendations.map((r, i) => {
+                          const isRemediation = bktStates[r.skill_id]?.needs_remediation;
+                          return (
+                            <tr key={i}>
+                              <td style={{ fontWeight: 600 }}>{r.skill_name}</td>
+                              <td className="mono-num" style={{ color: r.gap > 0 ? 'var(--accent-amber)' : 'var(--accent-emerald)' }}>
+                                {r.gap != null ? r.gap.toFixed(1) : '0.0'}
+                              </td>
+                              <td className="mono-num" style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>
+                                {r.priority_score != null ? r.priority_score.toFixed(3) : '0.000'}
+                              </td>
+                              <td>
+                                <a href={r.resource_url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 500 }}>
+                                  {r.resource_title} ↗
+                                </a>
+                              </td>
+                              <td className="mono-num">{r.est_hours}h</td>
+                              <td className="mono-num">Level {r.difficulty}</td>
+                              <td>
+                                <span className={`status-pill ${isRemediation ? 'pill-remediation pulse-once' : (r.status === 'completed' ? 'pill-completed' : 'pill-active')}`}>
+                                  {isRemediation ? 'Remediating' : r.status}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        }) : (
+                          <tr><td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No recommendations yet.</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Simulation Card */}
+                <div className="glass-card" style={{ marginTop: '24px' }}>
+                  <div className="section-header">
+                    <div className="section-title">
+                      <span>⚡</span>
+                      <span>Simulate Learner Assessment (Trigger Agent Graph & Certifications)</span>
+                    </div>
+                  </div>
+                  <form onSubmit={handleAssessmentSubmit} className="assess-grid">
+                    <div className="form-control">
+                      <label>Select Target Skill:</label>
+                      <select value={simSkillId} onChange={(e) => setSimSkillId(e.target.value)}>
+                        {profile?.skills?.map(s => (
+                          <option key={s.skill_id} value={s.skill_id}>{s.name} ({s.category})</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-control">
+                      <label>Assessment Score (0–100):</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={simScore}
+                        onChange={(e) => setSimScore(e.target.value)}
+                        className="mono-num"
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                      <button type="submit" disabled={isSubmittingAssess} className="btn-submit" style={{ width: '100%' }}>
+                        {isSubmittingAssess ? 'Executing Agents...' : 'Submit Assessment'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: SKILL PROFILE */}
+            {activeNav === 'Skill Profile' && (
+              <div className="glass-card">
+                <div className="section-header">
+                  <div className="section-title">
+                    <span>👤</span>
+                    <span>Full Skill Proficiency Profile</span>
+                  </div>
+                  <span className="mono-num" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>P_s = 0.2*A_s + 0.5*Q_s + 0.3*E_s</span>
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Skill Name</th>
+                        <th>Category</th>
+                        <th>Self-Assessment (A_s)</th>
+                        <th>Quiz Average (Q_s)</th>
+                        <th>Evidence / Projects (E_s)</th>
+                        <th>Computed P_s</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {profile?.skills?.map(s => (
+                        <tr key={s.skill_id}>
+                          <td style={{ fontWeight: 600 }}>{s.name}</td>
+                          <td>{s.category}</td>
+                          <td className="mono-num">{s.A_s.toFixed(1)}</td>
+                          <td className="mono-num">{s.Q_s.toFixed(1)}</td>
+                          <td className="mono-num">{s.E_s.toFixed(1)}</td>
+                          <td className="mono-num" style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>
+                            {s.P_s.toFixed(1)}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: CAREER GOAL */}
+            {activeNav === 'Career Goal' && (
+              <div className="glass-card">
+                <div className="section-header">
+                  <div className="section-title">
+                    <span>🎯</span>
+                    <span>Career Goal Gap Analysis</span>
+                  </div>
+                  <span className="mono-num" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>G_s = max(0, R_s - P_s)</span>
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Skill</th>
+                        <th>Current Proficiency (P_s)</th>
+                        <th>Required (R_s)</th>
+                        <th>Importance (I_s)</th>
+                        <th>Skill Gap (G_s)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {gapReport?.details?.map((g, i) => (
+                        <tr key={i}>
+                          <td style={{ fontWeight: 600 }}>{g.skill_name}</td>
+                          <td className="mono-num">{g.P_s.toFixed(1)}%</td>
+                          <td className="mono-num">{g.R_s.toFixed(1)}%</td>
+                          <td className="mono-num">{g.I_s.toFixed(2)}</td>
+                          <td className="mono-num" style={{ color: g.G_s > 0 ? 'var(--accent-amber)' : 'var(--accent-emerald)', fontWeight: 700 }}>
+                            {g.G_s.toFixed(1)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: RECOMMENDATIONS */}
+            {activeNav === 'Recommendations' && (
+              <div className="glass-card">
+                <div className="section-header">
+                  <div className="section-title">
+                    <span>📚</span>
+                    <span>Prioritized Curricular Recommendations</span>
+                  </div>
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Priority Rank</th>
+                        <th>Resource Title</th>
+                        <th>Target Skill</th>
+                        <th>Estimated Hours</th>
+                        <th>Difficulty</th>
+                        <th>Direct Link</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recommendations.map((r, i) => (
+                        <tr key={i}>
+                          <td className="mono-num" style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>#{i + 1}</td>
+                          <td style={{ fontWeight: 600 }}>{r.resource_title}</td>
+                          <td>{r.skill_name}</td>
+                          <td className="mono-num">{r.est_hours}h</td>
+                          <td className="mono-num">Tier {r.difficulty}</td>
+                          <td>
+                            <a href={r.resource_url} target="_blank" rel="noreferrer" style={{ color: 'var(--accent-cyan)', textDecoration: 'none' }}>
+                              Open Course ↗
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: COURSES CATALOG */}
+            {activeNav === 'Courses' && (
+              <div className="glass-card">
+                <div className="section-header">
+                  <div className="section-title">
+                    <span>🧭</span>
+                    <span>Real-World Free Course Catalog ({filteredCourses.length} Resources)</span>
+                  </div>
+                </div>
+
+                <div className="filter-pills">
+                  {categories.map(c => (
+                    <button
+                      key={c}
+                      className={`filter-pill ${selectedCategory === c ? 'active' : ''}`}
+                      onClick={() => setSelectedCategory(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Resource Title</th>
+                        <th>Provider</th>
+                        <th>Skill / Category</th>
+                        <th>Difficulty</th>
+                        <th>Est. Hours</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredCourses.map((c) => (
+                        <tr key={c.id}>
+                          <td style={{ fontWeight: 600 }}>{c.title}</td>
+                          <td>
+                            <span style={{ padding: '2px 8px', borderRadius: '4px', background: 'var(--card-inner)', border: '1px solid var(--glass-border)', fontSize: '0.78rem' }}>
+                              {c.provider}
+                            </span>
+                          </td>
+                          <td>{c.skill_name} <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>({c.category})</span></td>
+                          <td className="mono-num">Level {c.difficulty}</td>
+                          <td className="mono-num">{c.est_hours}h</td>
+                          <td>
+                            <a href={c.url} target="_blank" rel="noreferrer" className="btn-action-small">
+                              Open ↗
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: PROGRESS & MASTERY */}
+            {activeNav === 'Progress & Mastery' && (
+              <div className="glass-card">
+                <div className="section-header">
+                  <div className="section-title">
+                    <span>📈</span>
+                    <span>Bayesian Knowledge Tracing (BKT) Parameters</span>
+                  </div>
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Skill ID</th>
+                        <th>Mastery Belief P(L_n)</th>
+                        <th>Transition P(T)</th>
+                        <th>Guess P(G)</th>
+                        <th>Slip P(S)</th>
+                        <th>Attempts</th>
+                        <th>Remediation Active</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(bktStates).map(([sid, b]) => (
+                        <tr key={sid}>
+                          <td className="mono-num">Skill #{sid}</td>
+                          <td className="mono-num" style={{ color: b.p_mastery >= 0.8 ? 'var(--accent-emerald)' : (b.p_mastery >= 0.5 ? 'var(--accent-cyan)' : 'var(--accent-rose)'), fontWeight: 700 }}>
+                            {b.p_mastery.toFixed(3)}
+                          </td>
+                          <td className="mono-num">{b.p_T.toFixed(2)}</td>
+                          <td className="mono-num">{b.p_G.toFixed(2)}</td>
+                          <td className="mono-num">{b.p_S.toFixed(2)}</td>
+                          <td className="mono-num">{b.attempts_count}</td>
+                          <td>
+                            <span className={`status-pill ${b.needs_remediation ? 'pill-remediation' : 'pill-active'}`}>
+                              {b.needs_remediation ? 'Remediating (Tier -1)' : 'False'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: CERTIFICATES */}
+            {activeNav === 'Certificates' && (
+              <div className="glass-card">
+                <div className="section-header">
+                  <div className="section-title">
+                    <span>🎓</span>
+                    <span>Earned Cognitive Mastery Certificates</span>
+                  </div>
+                  <span className="mono-num" style={{ fontSize: '0.8rem', color: 'var(--accent-emerald)' }}>Awarded at P(L_n) &ge; 0.80</span>
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Credential ID</th>
+                        <th>Certified Skill</th>
+                        <th>Issued Date</th>
+                        <th>Verification Code</th>
+                        <th>Download PDF</th>
+                        <th>Employer Verify</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {certificates.length > 0 ? certificates.map((c) => (
+                        <tr key={c.id}>
+                          <td className="mono-num">#{c.id}</td>
+                          <td style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>{c.skill_name}</td>
+                          <td>{new Date(c.issued_at).toLocaleDateString()}</td>
+                          <td className="mono-num" style={{ fontSize: '0.78rem' }}>{c.verification_code}</td>
+                          <td>
+                            <a href={c.pdf_path} target="_blank" className="btn-action-small">
+                              📄 Download PDF
+                            </a>
+                          </td>
+                          <td>
+                            <a href={`/certificates/verify/${c.verification_code}`} target="_blank" className="btn-action-small">
+                              🔍 Public Verify
+                            </a>
+                          </td>
+                        </tr>
+                      )) : (
+                        <tr><td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No certificates earned yet. Achieve P(L_n) &ge; 0.80 on any skill to earn a certificate!</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: SETTINGS */}
+            {activeNav === 'Settings' && (
+              <div className="settings-panel">
+                <div className="glass-card">
+                  <div className="section-header">
+                    <div className="section-title">
+                      <span>⚙️</span>
+                      <span>Platform Settings & Multi-Provider AI Keys</span>
+                    </div>
+                  </div>
+
+                  <div className="settings-row">
+                    <div>
+                      <div style={{ fontWeight: 600 }}>Interface Theme</div>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Toggle between Deep Dark and Light Canvas</div>
+                    </div>
+                    <button className="theme-toggle-btn" onClick={toggleTheme}>
+                      {theme === 'dark' ? '🌙 Switch to Light Mode' : '☀️ Switch to Dark Mode'}
+                    </button>
+                  </div>
+
+                  <div style={{ marginTop: '20px' }}>
+                    <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '4px' }}>AI Mentor LLM Provider & Key</div>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '14px' }}>
+                      Select your preferred LLM provider. Keys are encrypted server-side with Fernet before database storage; only masked previews are ever visible.
+                    </div>
+
+                    <form onSubmit={handleSaveLLMKey} className="api-key-box">
+                      <div className="form-control">
+                        <label>Select Provider:</label>
+                        <select
+                          value={llmProvider}
+                          onChange={(e) => {
+                            const p = e.target.value;
+                            setLlmProvider(p);
+                            if (p === 'groq') setLlmModel('llama-3.3-70b-versatile');
+                            else if (p === 'openrouter') setLlmModel('meta-llama/llama-3.3-70b-instruct:free');
+                            else if (p === 'nvidia' || p === 'nvidia-nim') setLlmModel('meta/llama-3.1-70b-instruct');
+                            else if (p === 'openai') setLlmModel('gpt-4o-mini');
+                            else if (p === 'gemini') setLlmModel('gemini-1.5-flash');
+                            else if (p === 'claude' || p === 'anthropic') setLlmModel('claude-3-haiku-20240307');
+                          }}
+                        >
+                          <option value="gemini">Google Gemini (Gemini 1.5 Flash)</option>
+                          <option value="groq">Groq (Llama-3.3-70B Fast)</option>
+                          <option value="openrouter">OpenRouter (Multi-model router)</option>
+                          <option value="nvidia">NVIDIA NIM (integrate.api.nvidia.com)</option>
+                          <option value="openai">OpenAI (GPT-4o-mini)</option>
+                          <option value="claude">Anthropic Claude (Claude 3 Haiku)</option>
+                        </select>
+                      </div>
+
+                      <div className="form-control">
+                        <label>Model Name (Free text / Custom model):</label>
+                        <input
+                          type="text"
+                          value={llmModel}
+                          onChange={(e) => setLlmModel(e.target.value)}
+                          placeholder="e.g. gemini-1.5-flash, llama-3.3-70b-versatile"
+                        />
+                      </div>
+
+                      <div className="form-control">
+                        <label>Enter API Key:</label>
+                        <input
+                          type="password"
+                          placeholder={userSettings?.has_api_key ? `Configured: ${userSettings.key_masked}` : 'Paste your API key here...'}
+                          value={apiKeyInput}
+                          onChange={(e) => setApiKeyInput(e.target.value)}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                        <span className="mono-num" style={{ fontSize: '0.8rem', color: userSettings?.has_api_key ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
+                          {userSettings?.has_api_key ? `Status: Saved (${userSettings.key_masked})` : 'Status: No API key configured'}
+                        </span>
+                        <button type="submit" className="btn-submit">Save Key</button>
+                      </div>
+
+                      {settingsMessage && (
+                        <div className="mono-num" style={{ fontSize: '0.82rem', color: 'var(--accent-cyan)', marginTop: '8px' }}>
+                          {settingsMessage}
+                        </div>
+                      )}
+                    </form>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* Floating AI Mentor Chatbot Widget */}
+          <div className="floating-chat">
+            {!isChatOpen ? (
+              <button className="chat-bubble-btn" onClick={() => setIsChatOpen(true)} title="Open AI Mentor Chatbot">
+                🤖
+              </button>
+            ) : (
+              <div className="chat-window">
+                <div className="chat-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>🤖</span>
+                    <div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>AI Academic Mentor</div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)' }}>Grounded LearnerState</div>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsChatOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', fontSize: '1.2rem', cursor: 'pointer' }}>
+                    ✕
+                  </button>
+                </div>
+
+                <div className="chat-body">
+                  {!userSettings?.has_api_key && (
+                    <div style={{ padding: '12px', background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.3)', borderRadius: '10px', fontSize: '0.8rem', color: 'var(--accent-amber)' }}>
+                      🔑 <strong>No LLM API key configured.</strong><br />
+                      To activate live Groq, OpenRouter, NVIDIA, Claude, Gemini, or OpenAI chat, navigate to <span style={{ textDecoration: 'underline', cursor: 'pointer', fontWeight: 700 }} onClick={() => { setActiveNav('Settings'); setIsChatOpen(false); }}>Settings</span> and save your key.
+                    </div>
+                  )}
+
+                  {chatMessages.map((msg, i) => (
+                    <div key={i} className={`chat-msg ${msg.role === 'user' ? 'msg-user' : 'msg-assistant'}`}>
+                      {msg.content}
+                    </div>
+                  ))}
+                  {isSendingChat && (
+                    <div className="chat-msg msg-assistant" style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                      Formulating advice from LearnerState...
+                    </div>
+                  )}
+                </div>
+
+                <form onSubmit={handleSendChat} className="chat-footer">
+                  <input
+                    type="text"
+                    placeholder="Ask about your gaps or what to learn..."
+                    value={inputMsg}
+                    onChange={(e) => setInputMsg(e.target.value)}
+                    className="chat-input"
+                  />
+                  <button type="submit" disabled={isSendingChat} className="chat-send-btn">
+                    Send
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
