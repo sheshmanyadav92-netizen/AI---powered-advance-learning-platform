@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+  <title id="title">SkillPath AI system architecture</title>
+  <desc id="desc">The React dashboard calls FastAPI routers, services, and learning agents, which use SQLAlchemy and SQLite. Gemini is an optional language model integration.</desc>
+  <defs>
+    <linearGradient id="canvas" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f8f7"/>
+      <stop offset="1" stop-color="#edf3f1"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#66817d"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="440" rx="20" fill="url(#canvas)"/>
+  <text x="52" y="55" fill="#183a3b" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">A small, composable learning platform</text>
+  <text x="52" y="80" fill="#617673" font-family="Segoe UI, Arial, sans-serif" font-size="13">Deterministic core workflows with an optional generative layer</text>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <rect x="52" y="143" width="224" height="190" rx="12" fill="#fff" stroke="#d5e1dd"/>
+    <rect x="52" y="143" width="224" height="42" rx="12" fill="#dff2eb"/>
+    <path d="M52 173h224" stroke="#dff2eb" stroke-width="24"/>
+    <text x="74" y="170" fill="#245747" font-size="13" font-weight="700">PRESENTATION</text>
+    <text x="74" y="220" fill="#1d3435" font-size="19" font-weight="700">React + Vite</text>
+    <text x="74" y="248" fill="#617673" font-size="13">Dashboard and charts</text>
+    <text x="74" y="270" fill="#617673" font-size="13">Profiles and roadmaps</text>
+    <text x="74" y="292" fill="#617673" font-size="13">Assessments and mentor</text>
+
+    <rect x="359" y="143" width="478" height="190" rx="12" fill="#fff" stroke="#d5e1dd"/>
+    <rect x="359" y="143" width="478" height="42" rx="12" fill="#e5edf6"/>
+    <path d="M359 173h478" stroke="#e5edf6" stroke-width="24"/>
+    <text x="381" y="170" fill="#315372" font-size="13" font-weight="700">APPLICATION API · FASTAPI</text>
+    <rect x="381" y="204" width="197" height="101" rx="8" fill="#f5f8fb" stroke="#dce5ed"/>
+    <rect x="597" y="204" width="218" height="101" rx="8" fill="#f5f8fb" stroke="#dce5ed"/>
+    <text x="398" y="231" fill="#1d3435" font-size="15" font-weight="700">Routers</text>
+    <text x="398" y="255" fill="#617673" font-size="12">Learners · roles · actions</text>
+    <text x="398" y="275" fill="#617673" font-size="12">Matching · dashboard</text>
+    <text x="614" y="231" fill="#1d3435" font-size="15" font-weight="700">Services + agents</text>
+    <text x="614" y="255" fill="#617673" font-size="12">Analysis · scoring · planning</text>
+    <text x="614" y="275" fill="#617673" font-size="12">Assessment · mentor · orchestration</text>
+
+    <rect x="919" y="143" width="229" height="190" rx="12" fill="#fff" stroke="#d5e1dd"/>
+    <rect x="919" y="143" width="229" height="42" rx="12" fill="#f6ecd9"/>
+    <path d="M919 173h229" stroke="#f6ecd9" stroke-width="24"/>
+    <text x="941" y="170" fill="#805c24" font-size="13" font-weight="700">PERSISTENCE</text>
+    <text x="941" y="222" fill="#1d3435" font-size="17" font-weight="700">SQLAlchemy 2</text>
+    <text x="941" y="250" fill="#617673" font-size="13">SQLite database</text>
+    <text x="941" y="274" fill="#617673" font-size="13">Profiles · skills · roles</text>
+    <text x="941" y="296" fill="#617673" font-size="13">Resources · progress · traces</text>
+
+    <path d="M280 238h69" fill="none" stroke="#66817d" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M841 238h69" fill="none" stroke="#66817d" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="359" y="365" width="478" height="43" rx="9" fill="#e5f4ee" stroke="#cce8dc"/>
+    <text x="381" y="392" fill="#245747" font-size="13" font-weight="700">OPTIONAL · GEMINI</text>
+    <text x="524" y="392" fill="#617673" font-size="12">Explanations · mentor responses · generated quizzes</text>
+    <path d="M597 335v25" fill="none" stroke="#66817d" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow)"/>
+  </g>
+</svg>
